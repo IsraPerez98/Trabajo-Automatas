@@ -25,20 +25,27 @@ void pedir_alfabeto(vector<string> &Sigma)
     Sigma = separar_string_coma(alfabeto);
 }
 
-void pedir_tabla_transicion(string tabla_transicion[], vector<string> Q, vector<string> Sigma, int entrada)
+void pedir_tabla_transicion(vector<vector<string>> &tabla, vector<string> Q, vector<string> Sigma) // https://stackoverflow.com/a/34182883
 {
-    for(int i=0;i<Q.size();i++)
+    for(int i=0;i<Q.size();i++) 
     {
-        bool transicion_correcta = false;
-        while(!transicion_correcta)
+        cout << "i: " << i << endl;
+        for(int j=0;j<Sigma.size();j++)
         {
-            cout << "Ingrese el valor de transicion de " << Q[i] << " con entrada " << Sigma[entrada] << endl;
-            print_estados_posibles(Q);
-            cout << "Estado: ";
-            string estado_transicion;
-            getline(cin, estado_transicion);
-            transicion_correcta = verificar_estado_valido(estado_transicion, Q);
-            if(transicion_correcta) tabla_transicion[i] = estado_transicion;
+            while(1)
+            {
+                cout << "Ingrese la transicion de " << Q[i] << " con entrada " << Sigma[j] << endl;
+                print_estados_posibles(Q);
+                string estado_transicion;
+                getline(cin, estado_transicion);
+                bool transicion_correcta = verificar_estado_valido(estado_transicion, Q);
+                if(transicion_correcta)
+                {
+                    cout << "fijando valor " << estado_transicion << endl;
+                    tabla[i][j] = estado_transicion;
+                    break;
+                }
+            }
         }
     }
 }

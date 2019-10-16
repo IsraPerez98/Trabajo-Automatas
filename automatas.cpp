@@ -5,6 +5,7 @@
 
 #include "funciones_extra.h"
 #include "ingreso_automatas.h"
+#include "automata_obj.h"
 
 using namespace std;
 
@@ -21,19 +22,11 @@ int main()
     printf("Alfabeto:\n");
     print_vector(Sigma);
 
-    string tabla_transicion[Q.size()][Sigma.size()]; // estados x alfabeto
+    vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
 
-    for(int i=0; i<Sigma.size(); i++) // no podemos usar una funcion con un arreglo bidimensional sin conocer sus dimensiones
-    {
-        string tabla_transicion_una_letra[Q.size()]; // vector que contiene solo una entrada para cada estado, por ejemplo 0 o 1
-        pedir_tabla_transicion(tabla_transicion_una_letra, Q, Sigma, i);
-        for(int j=0; j<Q.size(); j++)
-        {
-            tabla_transicion[j][i] = tabla_transicion_una_letra[j];
-        }
-    }
+    pedir_tabla_transicion(tabla_transicion, Q, Sigma);
 
-    //print tabla_transicion
+    
     for(int i=0; i<Q.size(); i++)
     {
         for(int j=0; j<Sigma.size(); j++)
@@ -41,6 +34,7 @@ int main()
             cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << tabla_transicion[i][j] << endl;
         }
     }
+    
 
     int estado_inicial; // indice del vector Q, con el estado inicial
     estado_inicial = pedir_estado_inicial(Q);
