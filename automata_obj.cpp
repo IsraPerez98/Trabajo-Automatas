@@ -1,13 +1,10 @@
 #include<string>
 #include "automata_obj.h"
+
 using namespace std;
 
-Estado::Estado(string nombre)
+Estado::Estado(string nombre,bool inicial)
 {
     this->nombre = nombre;
-}
-
-void Estado::agregar_transicion(string nombre, Estado *estado)
-{
-    this->transiciones[nombre] = estado;
+    this->inicial = false;
 }
