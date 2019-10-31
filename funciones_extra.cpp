@@ -4,6 +4,7 @@
 #include<stdlib.h>
 #include<algorithm>
 
+#include "automata_obj.h"
 
 using namespace std;
 
@@ -78,4 +79,22 @@ bool estado_es_final(string estado, vector<string> Q, vector<int> estados_finale
         if(Q[estados_finales[i]] == estado) return true;
     }
     return false;
+}
+
+void print_tabla_transicion_afnd(vector<vector<vector<Estado*>>> tabla_transicion_afnd, vector<string> Q, vector<string> Sigma)
+{
+    cout << "tabla transicion afnd" << endl;
+    for(int i=0; i< Q.size(); i++)
+    {
+        for(int j=0;j<Sigma.size();j++)
+        {
+            cout << Q[i] << " con entrada " << Sigma[j] << " transiciones:  ";
+            vector<Estado*> transiciones = tabla_transicion_afnd[i][j];
+            for(int k=0;k<transiciones.size();k++)
+            {
+                cout << transiciones[k]->nombre << "  ";
+            }
+            cout << endl;
+        }
+    }
 }

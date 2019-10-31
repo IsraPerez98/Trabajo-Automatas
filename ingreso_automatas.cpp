@@ -39,7 +39,7 @@ void pedir_tabla_transicion(vector<vector<string>> &tabla, vector<string> Q, vec
 {
     for(int i=0;i<Q.size();i++) 
     {
-        cout << "i: " << i << endl;
+        //cout << "i: " << i << endl;
         for(int j=0;j<Sigma.size();j++)
         {
             while(1)
@@ -48,6 +48,7 @@ void pedir_tabla_transicion(vector<vector<string>> &tabla, vector<string> Q, vec
                 print_estados_posibles(Q, !afd); // consideramos el "-" como valido si es afnd
                 string estado_transicion;
                 getline(cin, estado_transicion);
+                cin.clear(); //??
                 bool transicion_correcta = verificar_estado_valido(estado_transicion, Q, !afd); // consideramos el "-" como valido si es afnd
                 if(transicion_correcta)
                 {
