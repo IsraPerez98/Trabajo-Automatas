@@ -2,7 +2,7 @@
 #include<stdlib.h>
 #include<string>
 #include<vector>
-
+#include<algorithm>
 
 #include "funciones_extra.h"
 #include "ingreso_automatas.h"
@@ -10,215 +10,189 @@
 
 using namespace std;
 
-int main()
+bool ingresado = false;
+bool afd; // grafo es afd o afnd
+
+vector<string> Q; //estados
+vector<string> Sigma; //alfabeto
+
+vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
+
+vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
+//este puede tomar varios valores simultaneos
+//mismo tramaño que Q
+
+int estado_inicial; // indice del vector Q, con el estado inicial
+vector<int> estados_finales; // indices del vector Q para los estados finales
+
+vector<Estado> estados_obj; // contiene los estados como objeto, mismo tamaño que Q
+
+
+void ingresar_automata()
 {
-    string estado = "NO INGRESADO";
-    string word;
-    int opcion;
-    int auto_opcion;
-
-    int estado_inicial; // indice del vector Q, con el estado inicial
-    vector<int> estados_finales; // indices del vector Q para los estados finales
-
-    vector<string> Q; //estados
-    vector<string> Sigma; //alfabeto
+    afd = preguntar_afd_o_afnd();
 
     pedir_estados(Q);
     pedir_alfabeto(Sigma);
 
-    vector<Estado> Automata; //Vector de objetos estado
-    vector<Estado> anfdtoafd; //Para guardar conversi�n de automata
+    cout << "Estados:" << endl;
+    print_vector(Q);
+    cout << "Alfabeto:" << endl;
+    print_vector(Sigma);
 
-    while(opcion!=7){
-        system("cls");
-        cout << "Dise" <<char(164)<<"ador de aut"<<char(162)<<"matas\t\t\tESTADO: "<<estado<<endl<<endl;
-        cout << "1- Ingresar transiciones\n2- Convertir AFND a AFD\n3- Verificar si la palabra es reconocible por el automata\n4- Obtener AFD equivalente\n5- Simplificar AFD\n6- Mostrar tabla de transici"<<char(162)<<"n\n7- Salir\n\n";
-        cout << "Ingrese una opci" <<char(162)<<"n: " ;
-        cin >> opcion;
+    //necesitamos rehacer estos vectores con nuevos tamaños
+    vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
+    vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
+    //este puede tomar varios valores simultaneos
+    //mismo tramaño que Q
 
-        if (cin.fail()){
-            system ("cls");
-            cout << "ERROR: Ingrese un n"<<char(163)<<"mero...\n";
-            cin.clear();
-            cin.ignore(INT_MAX,'\n');
-            system("pause");
+    pedir_tabla_transicion(tabla_transicion, Q, Sigma, afd);
+    
+    if(!afd)
+    {
+
+        pedir_transiciones_epsilon(transiciones_epsilon,Q);
+    }
+
+    //print de la tabla de transicion
+    for(int i=0; i<Q.size(); i++)
+    {
+        for(int j=0; j<Sigma.size(); j++)
+        {
+            cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << tabla_transicion[i][j] << endl;
         }
-        else{
-            switch(opcion){
-            case 1:
+    }
+
+    //print de los epsilon si es afnd
+    if(!afd)
+    {
+        for(int i=0; i<Q.size(); i++)
+        {
+            cout << "transiciones epsilon de " << Q[i] << " :" << endl;
+            for(int j=0; j < transiciones_epsilon[i].size();j++)
             {
-                if(estado=="NO INGRESADO")
-                {
-                    system("cls");
-
-                    limpiar(); //limpia el buffer de cin
-
-                    cout<<"Estados:\n";
-                    print_vector(Q);
-                    cout<<"Alfabeto:\n";
-                    print_vector(Sigma);
-
-                    cout << "Que desea ingresar?:\n1)AFD\n2)ANFD\n\n>>";
-                    cin>>auto_opcion;
-                    if(cin.fail())
-                        verificar("ERROR, INGRESE 1 o 2\n",auto_opcion);
-
-                    if(auto_opcion==1)
-                    {
-                        pedir_tabla_transicion(Q, Sigma,Automata);
-
-
-                        for(unsigned int i=0; i<Q.size(); i++)
-                        {
-                            for(unsigned int j=0; j<Sigma.size(); j++)
-                            {
-                                cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << Automata[i].transiciones.at(Sigma[j]) << endl;
-                            }
-                        }
-
-
-
-                        estado_inicial = pedir_estado_inicial(Q,Automata);
-                        Automata[estado_inicial].inicial = true;
-
-                        cout << "Estado inicial: " << Q[estado_inicial] << endl;
-                        pedir_estados_finales(Q, estados_finales);
-
-                        //print estados finales
-                        cout << "estados finales: " << endl;
-                        for(unsigned int i=0;i<estados_finales.size();i++)
-                        {
-                            cout << Q[estados_finales[i]] << "  ";
-                        }
-                        cout << endl;
-                        cout << "AFD Ingresado con " <<char(130)<< "xito!" <<endl;
-                        estado = "AFD INGRESADO";
-                        system("PAUSE");
-                        system("cls");
-                    }
-                    if(auto_opcion==2)
-                    {
-                        while(1)
-                        {
-                            int palabras;
-                            cout<<"Desea agregar una palabra de largo n al alfabeto?\n1)Si\n2)No\n>>";
-                            cin>>palabras;
-                            if(cin.fail())
-                                verificar("ERROR: Ingrese 1 o 2",palabras);
-                            else
-                            {
-                                if (palabras==1)
-                                {
-
-                                    limpiar();
-
-                                    cout<<"Alfabeto disponible para formar la palabra: ";
-                                    for(unsigned int i=0;i<Sigma.size();i++)
-                                        cout<<Sigma[i]<<"   ";
-                                    cout<<"Palabra: ";
-                                    limpiar();
-                                    getline(cin,word);
-                                    if(palabra_valida(Sigma,word))
-                                    {
-                                        Sigma.push_back(word);
-                                        Sigma.push_back("e");
-                                        break;
-                                    }
-                                    else
-                                    {
-                                        word.clear();
-                                        cout << "Ingrese una palabra valida..." << endl;
-                                    }
-
-                                }
-                                if (palabras == 2)
-                                {
-                                    Sigma.push_back("e");
-                                    break;
-                                }
-                            }
-                        }
-
-                        pedir_tabla_transicion_afnd(Q,Sigma,Automata);
-
-                        for(unsigned int i=0; i<Q.size(); i++)
-                        {
-                            for(unsigned int j=0; j<Sigma.size(); j++)
-                            {
-                                cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << Automata[i].transiciones.at(Sigma[j]) << endl;
-                            }
-                        }
-
-
-                        estado_inicial = pedir_estado_inicial(Q,Automata);
-                        Automata[estado_inicial].inicial = true;
-
-                        cout << "Estado inicial: " << Q[estado_inicial] << endl;
-                        pedir_estados_finales(Q, estados_finales);
-
-                        //print estados finales
-                        cout << "estados finales: " << endl;
-                        for(unsigned int i=0;i<estados_finales.size();i++)
-                        {
-                            cout << Q[estados_finales[i]] << "  ";
-                        }
-                        cout << endl;
-                        cout << "ANFD Ingresado con " <<char(130)<< "xito!" <<endl;
-                        estado = "ANFD INGRESADO";
-                        system("PAUSE");
-                        system("cls");
-                    }
-                    else
-                    {
-                        cout<<"ERROR: Ingrese una opci"<<char(162)<<"n v"<<char(160)<<"lida..."<<endl;
-                        system("pause");
-                        system("cls");
-                    }
-                    break;
-                }
+                cout << transiciones_epsilon[i][j] << "   ";
             }
-
-            case 2:
-                system("cls");
-                cout << "En construccion..." <<endl;
-                system("pause");
-                system("cls");
-                break;
-            case 3 :
-                system("cls");
-                cout << "En construccion..." <<endl;
-                system("pause");
-                system("cls");
-                break;
-            case 4 :
-                system("cls");
-                cout << "En construccion..." <<endl;
-                system("pause");
-                system("cls");
-                break;
-            case 5:
-             {
-                 vector<Estado>automat_simp = simplificar(Automata,estado_inicial,estados_finales,Q,Sigma);
-                 //mostrar_tabla_transicion(tabla_simp,Sigma,Q);
-                 break;
-             }
-            case 6:
-                mostrar_tabla_transicion(Sigma,Q,Automata);
-                cout<<endl;
-                system("pause");
-                system("cls");
-                break;
-            case 7:
-                break;
-            default:
-                cout << "ERROR: Ingrese una opci"<<char(162)<<"n v"<<char(160)<<"lida...\n\n";
-                system("pause");
-            }
+            cout << endl;
         }
-     }
+    }
+    
+    estado_inicial = pedir_estado_inicial(Q);
+
+    cout << "Estado inicial: " << Q[estado_inicial] << endl;
+
+    pedir_estados_finales(Q, estados_finales);
+
+    //print estados finales
+    cout << "estados finales: " << endl;
+    for(int i=0;i<estados_finales.size();i++)
+    {
+        cout << Q[estados_finales[i]] << "  ";
+    }
+    cout << endl;
+
+    //generamos estados como objeto para cada Q
+    for(int i=0;i<Q.size();i++)
+    {
+        Estado estado_obj(Q[i], afd, false, false);
+        estados_obj.push_back(estado_obj);
+    }
+    
+    // fijamos estado inicial
+    estados_obj[estado_inicial].incial = true;
+    //fijamos estados finales
+    for(int i=0;i<estados_finales.size();i++)
+    {
+        estados_obj[estados_finales[i]].final = true;
+    }
+
+    //generamos las transiciones de cada objeto
+    for(int i=0;i<estados_obj.size();i++)
+    {
+        estados_obj[i].generar_transiciones(Q,Sigma,tabla_transicion,estados_obj);
+    }
+
+    //si es afnd tambien generamos las transiciones epsilon
+    if(!afd)
+    {
+        for(int i=0;i<estados_obj.size();i++)
+        {
+            estados_obj[i].genererar_transiciones_epsilon(Q,transiciones_epsilon,estados_obj);
+        }    
+    }
+
+    //print de todas las transiciones de los objetos
+    for(int i=0;i<estados_obj.size();i++)
+    {
+        estados_obj[i].print_transiciones();
+    }
+    ingresado = true;
+}
+
+void comprobar_palabra()
+{
+    cout << "Ingrese una palabra" << endl;
+    string palabra;
+    cin.ignore();
+    getline(cin,palabra);
+    bool pertenece = estados_obj[estado_inicial].palabra_pertenece(palabra);
+    if(pertenece) cout << "la palabra " << palabra << " pertenece al automata" << endl;
+    else cout << "la palabra no pertenece al automata" << endl;
+    cin.ignore();
+    cin.get();
+}
+
+bool verificar_si_ha_ingresado(bool pause) // verificamos si se ha ingresado un afd o un afnd
+{
+    if(!ingresado)
+    {
+        cout << "AUN NO SE INGRESA UN AFD o AFND" << endl;
+        if(pause)
+        {
+            cin.ignore();
+            cin.get();
+        }
+        return false;
+    }
+    return true;
+}
+
+void convertir_a_afd()
+{
+    if(afd)
+    {
+        cout << "El automata ya es AFD" << endl;
+    }
 
 
+}
 
+int main()
+{
+    int opcion = -1;
+    while(opcion != 5)
+    {
+        cout << "AFD y AFND" << endl;
+        verificar_si_ha_ingresado(false);
+        cout << "1- Ingresar un AFD o AFND" << endl;
+        cout << "2- Ingresar una palabra y comprobar si pertenece" << endl;
 
+        cin >> opcion;
+        switch(opcion)
+        {
+            case 1:
+                ingresar_automata();
+                break;
+            case 2:
+                if(verificar_si_ha_ingresado(true))  comprobar_palabra();
+                break;
+            case 3:
+                if(verificar_si_ha_ingresado(true)) convertir_a_afd();
+                break;
+        }
+    }
+    //system("PAUSE");
+    cin.ignore();
+    cin.get();
     return 0;
 }

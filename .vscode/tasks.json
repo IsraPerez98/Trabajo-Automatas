@@ -28,8 +28,8 @@
             "args": [
                 "-g",
                 "-o",
-                "automata.out",
-                "automatas.cpp", "funciones_extra.cpp", "ingreso_automatas.cpp", "automata_obj.cpp"
+                "main.out",
+                "main.cpp", "funciones_extra.cpp", "ingreso_automatas.cpp", "automata_obj.cpp"
             ],
             "problemMatcher": [
                 "$gcc"
