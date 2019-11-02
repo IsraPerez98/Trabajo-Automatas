@@ -3,10 +3,12 @@
 #include<string>
 #include<vector>
 #include<algorithm>
+#include <limits>
 
 #include "funciones_extra.h"
 #include "ingreso_automatas.h"
 #include "automata_obj.h"
+#include "funciones_conversion.h"
 
 using namespace std;
 
@@ -55,13 +57,7 @@ void ingresar_automata()
     }
 
     //print de la tabla de transicion
-    for(int i=0; i<Q.size(); i++)
-    {
-        for(int j=0; j<Sigma.size(); j++)
-        {
-            cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << tabla_transicion[i][j] << endl;
-        }
-    }
+    print_tabla_transicion(tabla_transicion,Q,Sigma);
 
     //print de los epsilon si es afnd
     if(!afd)
@@ -158,33 +154,18 @@ bool verificar_si_ha_ingresado(bool pause) // verificamos si se ha ingresado un 
 }
 
 
-void agregar_estados_pseudo(int posicion,vector<Estado> estados_obj,vector<Estado*> &pseudo_iniciales) // la posicion del estado en el vector estados_obj, estados_obj, y el vector donde se almacenan los estados pseudo
-{
-    for(int i=0;i<estados_obj[posicion].transiciones_epsilon.size();i++)
-    {
-        //las transiciones con epsilon del estado incial
-        Estado *est_transicion = estados_obj[posicion].transiciones_epsilon[i];
-        //solo si no hemos agregado antes este estado lo consideramos
-        if(find(pseudo_iniciales.begin(), pseudo_iniciales.end(), est_transicion) == pseudo_iniciales.end()) // https://stackoverflow.com/a/3450906
-        {
-            pseudo_iniciales.push_back(est_transicion); //lo agregamos al vector
-            int pos_siguiente = obtener_posicion_estado(est_transicion->nombre,Q);
-            agregar_estados_pseudo(pos_siguiente,estados_obj, pseudo_iniciales); // buscamos mas vectores pseudo, de forma recursiva
-        }
-    }
-}
-
 void convertir_a_afd()
 {
     if(afd)
     {
         cout << "El automata ya es AFD" << endl;
+        return;
     }
 
     cout << "verificando el estado incial + pseudo-iniciales" << endl;
     vector<Estado*> pseudo_iniciales;
     pseudo_iniciales.push_back(&estados_obj[estado_inicial]);
-    agregar_estados_pseudo(estado_inicial, estados_obj, pseudo_iniciales);
+    obtener_estados_pseudo(estado_inicial, Q, estados_obj, pseudo_iniciales);
 
     cout << "haciendo una tabla de transicion" << endl;
     // Q x Sigma x estados_transicion 
@@ -205,6 +186,30 @@ void convertir_a_afd()
 
     //print tabla_transicion 
     print_tabla_transicion_afnd(tabla_transicion_afnd, Q, Sigma);
+
+    vector<string> nueva_Q;
+    vector<Estado> nuevos_estados_obj;
+    vector<vector<string>> tabla_transicion(nueva_Q.size(),vector<string>(Sigma.size()));
+    //nuevo estado incial = combinacion de todos los pseudo iniciales
+    int estado_inicial = combinar_estados(pseudo_iniciales, true, nueva_Q, nuevos_estados_obj);
+    cout << "nuevo estado inicial creado " << nuevos_estados_obj[estado_inicial].nombre << endl;
+
+    generar_nuevos_estados_afd(Sigma,estado_inicial, pseudo_iniciales, tabla_transicion_afnd, Q, nueva_Q, tabla_transicion, nuevos_estados_obj);
+
+    Q = nueva_Q;
+    vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); // borramos todas las transiciones con epsilon
+    print_tabla_transicion(tabla_transicion,Q,Sigma);
+
+    //generamos las nuevas transiciones
+    for (int i=0; i<nuevos_estados_obj.size();i++)
+    {
+        nuevos_estados_obj[i].generar_transiciones(Q,Sigma,tabla_transicion,nuevos_estados_obj);
+    }
+    estados_obj = nuevos_estados_obj;
+    afd = true;
+
+    cin.ignore();
+    cin.get();
 }
 
 int main()
@@ -218,7 +223,8 @@ int main()
         cout << "2- Ingresar una palabra y comprobar si pertenece" << endl;
         cout << "3- Transformar AFND a AFD" << endl;
         cin >> opcion;
-        cin.ignore();
+        cin.clear();
+        cin.ignore(numeric_limits<streamsize>::max(), '\n');
         switch(opcion)
         {
             case 1:
@@ -233,7 +239,5 @@ int main()
         }
     }
     //system("PAUSE");
-    cin.ignore();
-    cin.get();
     return 0;
 }

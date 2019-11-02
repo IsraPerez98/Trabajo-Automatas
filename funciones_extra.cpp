@@ -35,8 +35,9 @@ void print_vector(vector<string> a)
 {
     for(int i=0; i<a.size();i++)
     {
-        cout << a[i] << endl;
+        cout << a[i] << "  ";
     }
+    cout << endl;
 }
 
 bool verificar_estado_valido(string estado, vector<string> Q, bool considerar_guion)
@@ -60,6 +61,12 @@ int obtener_posicion_estado(string estado, vector<string> Q)
     return -1;
 }
 
+int obtener_posicion_estado(Estado estado, vector<string> Q)
+{
+    string nombre_estado = estado.nombre;
+    return obtener_posicion_estado(nombre_estado,Q);
+}
+
 void print_estados_posibles(vector<string> Q, bool incluir_guion)
 {
     cout << "Valores posibles: ";
@@ -81,20 +88,28 @@ bool estado_es_final(string estado, vector<string> Q, vector<int> estados_finale
     return false;
 }
 
-void print_tabla_transicion_afnd(vector<vector<vector<Estado*>>> tabla_transicion_afnd, vector<string> Q, vector<string> Sigma)
+void print_vector_estados(vector<Estado*> estados)
 {
-    cout << "tabla transicion afnd" << endl;
-    for(int i=0; i< Q.size(); i++)
+    for(int i=0;i<estados.size(); i++)
     {
-        for(int j=0;j<Sigma.size();j++)
+        cout << estados[i]->nombre << "  ";
+    }
+    cout << endl;
+}
+
+void print_tabla_transicion(vector<vector<string>> tabla_transicion, vector<string> Q, vector<string> Sigma)
+{
+    //print de la tabla de transicion
+    for(int i=0; i<Q.size(); i++)
+    {
+        for(int j=0; j<Sigma.size(); j++)
         {
-            cout << Q[i] << " con entrada " << Sigma[j] << " transiciones:  ";
-            vector<Estado*> transiciones = tabla_transicion_afnd[i][j];
-            for(int k=0;k<transiciones.size();k++)
-            {
-                cout << transiciones[k]->nombre << "  ";
-            }
-            cout << endl;
+            cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << tabla_transicion[i][j] << endl;
         }
     }
+}
+
+bool comparacion_string(std::string a, std::string b) // funcion utilizada para ordenar un vector de forma alfabetica
+{
+    return a<b;
 }

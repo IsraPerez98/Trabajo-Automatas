@@ -10,6 +10,8 @@ Estado::Estado(string nombre, bool afd, bool inicial, bool final)
 {
     this->nombre = nombre;
     this->afd = afd;
+    this->incial = inicial;
+    this->final = final;
 }
 
 void Estado::print_transiciones() // https://stackoverflow.com/a/14070977
@@ -109,20 +111,28 @@ void Estado::transiciones_afnd(vector<Estado*> &transiciones_posibles, string le
 
 bool Estado::palabra_pertenece(string palabra)
 {
-    if(palabra == "") return this->final; // si no tenemos nada mas que revisar, comprobamos si terminamos en estado final
-
-    string letra_incial(1,palabra[0]); // palabra[0] es char asi que debemos convertir
-    cout << letra_incial << "  ";
-    string palabra_sig = "";
-    for(int i=1;i<palabra.length();i++)
+    if(this->afd)
     {
-        palabra_sig = palabra_sig + palabra[i];
+        if(palabra == "") return this->final; // si no tenemos nada mas que revisar, comprobamos si terminamos en estado final
+
+        string letra_incial(1,palabra[0]); // palabra[0] es char asi que debemos convertir
+        cout << letra_incial << "  ";
+        string palabra_sig = "";
+        for(int i=1;i<palabra.length();i++)
+        {
+            palabra_sig = palabra_sig + palabra[i];
+        }
+
+        //revisamos si existe un siguiente movimiento
+        if(this->transiciones.find(letra_incial) == this->transiciones.end() ) return false;
+
+        //saltamos al siguiente estado
+        cout << this->transiciones[letra_incial]->nombre << endl;
+        return this->transiciones[letra_incial]->palabra_pertenece(palabra_sig);
     }
-
-    //revisamos si existe un siguiente movimiento
-    if(this->transiciones.find(letra_incial) == this->transiciones.end() ) return false;
-
-    //saltamos al siguiente estado
-    cout << this->transiciones[letra_incial]->nombre << endl;
-    return this->transiciones[letra_incial]->palabra_pertenece(palabra_sig);
+    else
+    {
+        //TODO
+        return false;
+    }
 }

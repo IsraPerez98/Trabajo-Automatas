@@ -23,6 +23,6 @@ class Estado
         bool afd = false;
         map<string, Estado*> transiciones; // mapa entrada:estado
         vector<Estado*> transiciones_epsilon;
-    private:
         bool transiciones_hechas = false;
+    private:
 };
