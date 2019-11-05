@@ -2,7 +2,7 @@
 #include<map>
 #include<iostream>
 #include<algorithm>
-#include "automata_obj.h"
+
 #include "funciones_extra.h"
 using namespace std;
 
@@ -10,13 +10,12 @@ Estado::Estado(string nombre, bool afd, bool inicial, bool final)
 {
     this->nombre = nombre;
     this->afd = afd;
-    this->incial = inicial;
+    this->inicial = inicial;
     this->final = final;
 }
 
 void Estado::print_transiciones() // https://stackoverflow.com/a/14070977
 {
-    cout << "transiciones de " << this->nombre << endl;
     for (auto it = this->transiciones.cbegin(); it != this->transiciones.cend(); ++it)
     {
         cout << " entrada: " << it -> first << " transicion " << it->second->nombre << endl;
@@ -32,6 +31,20 @@ void Estado::print_transiciones() // https://stackoverflow.com/a/14070977
         }
         cout << endl;
     }
+}
+
+void Estado::print()
+{
+    cout << "Estado: " << this->nombre << " :  " << endl;
+
+    if(this->afd) cout << "AFD" << endl;
+    else cout << "AFND" << endl;
+
+    if(this->inicial) cout << "[estado inicial]" << endl;
+    if(this->final) cout << "[estado final]" << endl;
+
+    print_transiciones();
+    
 }
 
 void Estado::generar_transiciones(vector<string> Q, vector<string> Sigma, vector<vector<string>> tabla_transicion, vector<Estado> &estados_obj)
@@ -109,6 +122,15 @@ void Estado::transiciones_afnd(vector<Estado*> &transiciones_posibles, string le
     }
 }
 
+Estado* Estado::obtener_transicion_afd(string letra) // retorna la transicion hacia donde se debe mover con esa letra, NULL en otro caso
+{
+    if(this->transiciones.find(letra) != this->transiciones.end() )
+    {
+        return this->transiciones[letra];
+    }
+    return NULL;
+}
+
 bool Estado::palabra_pertenece(string palabra)
 {
     if(this->afd)
@@ -123,16 +145,18 @@ bool Estado::palabra_pertenece(string palabra)
             palabra_sig = palabra_sig + palabra[i];
         }
 
-        //revisamos si existe un siguiente movimiento
-        if(this->transiciones.find(letra_incial) == this->transiciones.end() ) return false;
-
-        //saltamos al siguiente estado
-        cout << this->transiciones[letra_incial]->nombre << endl;
-        return this->transiciones[letra_incial]->palabra_pertenece(palabra_sig);
+        Estado* est_siguiente = obtener_transicion_afd(letra_incial);
+        if(est_siguiente != NULL)
+        {
+            cout << "siguiente estado " << est_siguiente->nombre;
+            return est_siguiente->palabra_pertenece(palabra_sig);
+        }
+        return false;
     }
-    else
+    else // transiciones afnd
     {
         //TODO
         return false;
     }
 }
+

@@ -30,7 +30,7 @@ void obtener_estados_pseudo(int posicion,vector<string> Q,vector<Estado> estados
 {
     for(int i=0;i<estados_obj[posicion].transiciones_epsilon.size();i++)
     {
-        //las transiciones con epsilon del estado incial
+        //las transiciones con epsilon del estado inicial
         Estado *est_transicion = estados_obj[posicion].transiciones_epsilon[i];
         //solo si no hemos agregado antes este estado lo consideramos
         if(find(pseudo_iniciales.begin(), pseudo_iniciales.end(), est_transicion) == pseudo_iniciales.end()) // https://stackoverflow.com/a/3450906

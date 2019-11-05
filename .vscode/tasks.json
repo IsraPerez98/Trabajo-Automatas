@@ -31,7 +31,9 @@
                 "funciones_extra.cpp",
                 "ingreso_automatas.cpp",
                 "automata_obj.cpp",
-                "funciones_conversion.cpp"
+                "funciones_conversion.cpp",
+                "funciones_simplificacion.cpp",
+                "tabla_comparativa_obj.cpp"
             ],
             "problemMatcher": [
                 "$gcc"

@@ -2,6 +2,8 @@
 #include<stdlib.h>
 #include<string>
 #include<vector>
+#include<limits>
+
 #include "funciones_extra.h"
 
 using namespace std;
@@ -9,16 +11,22 @@ using namespace std;
 bool preguntar_afd_o_afnd()
 {
     cout << "El automata a ingresar es AFD? S/N" << endl;
-    string respuesta;
-    cin.ignore(); // ??
-    getline(cin, respuesta);
-    if(respuesta[0] == 's' || respuesta[0] == 'S') return true;
+    char respuesta;
+    cin >> respuesta;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n'); //https://stackoverflow.com/a/23745035
+    if(respuesta == 's' || respuesta == 'S')
+    {
+        cout << "Automata AFD" << endl;
+        return true;
+    }
+    cout << "Automata AFND" << endl;
     return false;
 }
 
 void pedir_estados(vector<string> &Q)
 {
-    printf("Ingrese los estados separados por una coma.\n");
+    cout << "Ingrese los estados separados por una coma." << endl;
     cout << "Q: ";
 
     string estados_str;
@@ -29,7 +37,8 @@ void pedir_estados(vector<string> &Q)
 
 void pedir_alfabeto(vector<string> &Sigma)
 {
-    printf("Ingrese el alfabeto utilizado por el automata (separado por una coma).\n");
+    cout << "Ingrese el alfabeto utilizado por el automata (separado por una coma)." << endl;
+    cout << "Sigma: ";
     string alfabeto;
     getline(cin,alfabeto);
     Sigma = separar_string_coma(alfabeto);
@@ -52,7 +61,7 @@ void pedir_tabla_transicion(vector<vector<string>> &tabla, vector<string> Q, vec
                 bool transicion_correcta = verificar_estado_valido(estado_transicion, Q, !afd); // consideramos el "-" como valido si es afnd
                 if(transicion_correcta)
                 {
-                    cout << "fijando valor " << estado_transicion << endl;
+                    //cout << "fijando valor " << estado_transicion << endl;
                     tabla[i][j] = estado_transicion;
                     break;
                 }
@@ -94,7 +103,7 @@ int pedir_estado_inicial(vector<string> Q)
 {
     while(1)
     {
-        cout << "Ingrese el estado incial." << endl;
+        cout << "Ingrese el estado inicial." << endl;
         print_estados_posibles(Q, false);
         cout << endl << "Estado: ";
         string estado;

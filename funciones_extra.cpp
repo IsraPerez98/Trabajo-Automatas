@@ -109,6 +109,19 @@ void print_tabla_transicion(vector<vector<string>> tabla_transicion, vector<stri
     }
 }
 
+void print_tabla_epsilon(vector<vector<string>> transiciones_epsilon, vector<string> Q, vector<string> Sigma)
+{
+    for(int i=0; i<Q.size(); i++)
+    {
+        cout << "transiciones epsilon de " << Q[i] << " : ";
+        for(int j=0; j < transiciones_epsilon[i].size();j++)
+        {
+            cout << transiciones_epsilon[i][j] << "   ";
+        }
+        cout << endl;
+    }
+}
+
 bool comparacion_string(std::string a, std::string b) // funcion utilizada para ordenar un vector de forma alfabetica
 {
     return a<b;

@@ -3,12 +3,14 @@
 #include<string>
 #include<vector>
 #include<algorithm>
-#include <limits>
+#include<limits>
 
 #include "funciones_extra.h"
 #include "ingreso_automatas.h"
 #include "automata_obj.h"
 #include "funciones_conversion.h"
+#include "funciones_simplificacion.h"
+#include "tabla_comparativa_obj.h"
 
 using namespace std;
 
@@ -29,6 +31,13 @@ vector<int> estados_finales; // indices del vector Q para los estados finales
 
 vector<Estado> estados_obj; // contiene los estados como objeto, mismo tamaño que Q
 
+void pause() // analogo al system pause
+{
+    cout << "Presione Enter para continuar" << endl;
+    cin.clear();
+    cin.get();
+    //cin.ignore(numeric_limits<streamsize>::max(), '\n');
+}
 
 void ingresar_automata()
 {
@@ -43,10 +52,10 @@ void ingresar_automata()
     print_vector(Sigma);
 
     //necesitamos rehacer estos vectores con nuevos tamaños
-    vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
-    vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
-    //este puede tomar varios valores simultaneos
-    //mismo tramaño que Q
+    tabla_transicion.resize(Q.size(),vector<string>(Sigma.size()));
+    transiciones_epsilon.resize(Q.size(), vector<string>(0));
+    //vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
+    //vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
 
     pedir_tabla_transicion(tabla_transicion, Q, Sigma, afd);
     
@@ -57,20 +66,12 @@ void ingresar_automata()
     }
 
     //print de la tabla de transicion
-    print_tabla_transicion(tabla_transicion,Q,Sigma);
+    //print_tabla_transicion(tabla_transicion,Q,Sigma);
 
     //print de los epsilon si es afnd
     if(!afd)
     {
-        for(int i=0; i<Q.size(); i++)
-        {
-            cout << "transiciones epsilon de " << Q[i] << " : ";
-            for(int j=0; j < transiciones_epsilon[i].size();j++)
-            {
-                cout << transiciones_epsilon[i][j] << "   ";
-            }
-            cout << endl;
-        }
+        print_tabla_epsilon(transiciones_epsilon,Q,Sigma);
     }
     
     estado_inicial = pedir_estado_inicial(Q);
@@ -95,7 +96,7 @@ void ingresar_automata()
     }
     
     // fijamos estado inicial
-    estados_obj[estado_inicial].incial = true;
+    estados_obj[estado_inicial].inicial = true;
     //fijamos estados finales
     for(int i=0;i<estados_finales.size();i++)
     {
@@ -117,10 +118,10 @@ void ingresar_automata()
         }    
     }
 
-    //print de todas las transiciones de los objetos
+    //print de todos los estados
     for(int i=0;i<estados_obj.size();i++)
     {
-        estados_obj[i].print_transiciones();
+        estados_obj[i].print();
     }
     ingresado = true;
 }
@@ -133,21 +134,14 @@ void comprobar_palabra()
     getline(cin,palabra);
     bool pertenece = estados_obj[estado_inicial].palabra_pertenece(palabra);
     if(pertenece) cout << "la palabra " << palabra << " pertenece al automata" << endl;
-    else cout << "la palabra no pertenece al automata" << endl;
-    cin.ignore();
-    cin.get();
+    else cout << "la palabra NO pertenece al automata" << endl;
 }
 
-bool verificar_si_ha_ingresado(bool pause) // verificamos si se ha ingresado un afd o un afnd
+bool verificar_si_ha_ingresado() // verificamos si se ha ingresado un afd o un afnd
 {
     if(!ingresado)
     {
         cout << "AUN NO SE INGRESA UN AFD o AFND" << endl;
-        if(pause)
-        {
-            cin.ignore();
-            cin.get();
-        }
         return false;
     }
     return true;
@@ -162,7 +156,7 @@ void convertir_a_afd()
         return;
     }
 
-    cout << "verificando el estado incial + pseudo-iniciales" << endl;
+    cout << "verificando el estado inicial + pseudo-iniciales" << endl;
     vector<Estado*> pseudo_iniciales;
     pseudo_iniciales.push_back(&estados_obj[estado_inicial]);
     obtener_estados_pseudo(estado_inicial, Q, estados_obj, pseudo_iniciales);
@@ -190,7 +184,7 @@ void convertir_a_afd()
     vector<string> nueva_Q;
     vector<Estado> nuevos_estados_obj;
     vector<vector<string>> tabla_transicion(nueva_Q.size(),vector<string>(Sigma.size()));
-    //nuevo estado incial = combinacion de todos los pseudo iniciales
+    //nuevo estado inicial = combinacion de todos los pseudo iniciales
     int estado_inicial = combinar_estados(pseudo_iniciales, true, nueva_Q, nuevos_estados_obj);
     cout << "nuevo estado inicial creado " << nuevos_estados_obj[estado_inicial].nombre << endl;
 
@@ -208,8 +202,50 @@ void convertir_a_afd()
     estados_obj = nuevos_estados_obj;
     afd = true;
 
-    cin.ignore();
-    cin.get();
+    //imrprimimos los nuevos estados
+    for(int i=0;i<estados_obj.size();i++)
+    {
+        estados_obj[i].print();
+    }
+}
+
+void simplificar_afd()
+{
+    if(!afd)
+    {
+        cout << "Para simplificar el automata debe ser AFD" << endl;
+        return;
+    }
+
+    //generamos tabla de los estados
+    vector<vector<bool>> compatibilidad(Q.size(), vector<bool>(Q.size()));
+    vector<tabla_comparativa> tablas_comparativas; // tabla
+    //revisamos compatibilidad
+    crear_matriz_compatibilidad(compatibilidad,tablas_comparativas,estados_obj);
+    
+    cout << "comparando estados compatibles" << endl;
+    // por cada tabla comparativa, se hace la comparacion
+    for(int i=0;i<tablas_comparativas.size();i++)
+    {
+        //cout << "compat " << tablas_comparativas[i].estado_1->nombre << "  " << tablas_comparativas[i].estado_2->nombre << endl;
+        if(!tablas_comparativas[i].han_sido_comparados) // solo si no han sido comparadas
+        tablas_comparativas[i].comprobar_si_son_distinguibles(compatibilidad,Sigma);
+    }
+
+    //este vector tendra los pares de estados no distinguibles SIN REPETIR
+    vector<vector<Estado*>> estados_nd;
+    // comprobamos los que no sean distinguibles
+    generar_vector_nd(tablas_comparativas, estados_nd);
+
+    //eliminamos el primero de cada par
+    eliminar_estados_nd(estados_nd, estados_obj, Q, Sigma, tabla_transicion, &estado_inicial, estados_finales);
+
+    //imprimimos el resultado
+    for(int i=0;i<estados_obj.size();i++)
+    {
+        estados_obj[i].print();
+    }
+
 }
 
 int main()
@@ -218,10 +254,11 @@ int main()
     while(opcion != 5)
     {
         cout << "AFD y AFND" << endl;
-        verificar_si_ha_ingresado(false);
+        verificar_si_ha_ingresado();
         cout << "1- Ingresar un AFD o AFND" << endl;
         cout << "2- Ingresar una palabra y comprobar si pertenece" << endl;
         cout << "3- Transformar AFND a AFD" << endl;
+        cout << "4- Simplificar AFD" << endl;
         cin >> opcion;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -229,12 +266,19 @@ int main()
         {
             case 1:
                 ingresar_automata();
+                pause();
                 break;
             case 2:
-                if(verificar_si_ha_ingresado(true))  comprobar_palabra();
+                if(verificar_si_ha_ingresado())  comprobar_palabra();
+                pause();
                 break;
             case 3:
-                if(verificar_si_ha_ingresado(true)) convertir_a_afd();
+                if(verificar_si_ha_ingresado()) convertir_a_afd();
+                pause();
+                break;
+            case 4:
+                if(verificar_si_ha_ingresado()) simplificar_afd();
+                pause();
                 break;
         }
     }
