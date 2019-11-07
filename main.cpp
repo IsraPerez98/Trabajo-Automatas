@@ -47,6 +47,7 @@ void ingresar_automata()
     estados_obj.clear();
     tabla_transicion.clear();
     transiciones_epsilon.clear();
+    estados_finales.clear();
     afd = preguntar_afd_o_afnd();
 
     pedir_estados(Q);
