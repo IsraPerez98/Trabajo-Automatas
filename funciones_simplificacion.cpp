@@ -16,7 +16,7 @@ void crear_matriz_compatibilidad(vector<vector<bool>> &compatibilidad, vector<ta
         {
             cout << "comprobando compatibilidad " << estados_obj[i].nombre << " con " << estados_obj[j].nombre << endl;
             bool compatible = (estados_obj[i].final == estados_obj[j].final);
-            compatibilidad[i][j] == compatible;
+            compatibilidad[i][j] = compatible;
             // creamos la tabla comparativa para el par de estados
             tabla_comparativa tabla(&estados_obj[i], &estados_obj[j]);
             tabla_comparativa tabla2(&estados_obj[j], &estados_obj[i]);

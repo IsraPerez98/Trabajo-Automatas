@@ -41,6 +41,12 @@ void pause() // analogo al system pause
 
 void ingresar_automata()
 {
+    //como vamos a ingresar uno nuevo, reiniciamos todos los valores
+    Q.clear();
+    Sigma.clear();
+    estados_obj.clear();
+    tabla_transicion.clear();
+    transiciones_epsilon.clear();
     afd = preguntar_afd_o_afnd();
 
     pedir_estados(Q);
@@ -51,7 +57,7 @@ void ingresar_automata()
     cout << "Alfabeto:" << endl;
     print_vector(Sigma);
 
-    //necesitamos rehacer estos vectores con nuevos tamaños
+    //necesitamos redimensionar estos vectores
     tabla_transicion.resize(Q.size(),vector<string>(Sigma.size()));
     transiciones_epsilon.resize(Q.size(), vector<string>(0));
     //vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
@@ -69,10 +75,12 @@ void ingresar_automata()
     //print_tabla_transicion(tabla_transicion,Q,Sigma);
 
     //print de los epsilon si es afnd
+    /*
     if(!afd)
     {
         print_tabla_epsilon(transiciones_epsilon,Q,Sigma);
     }
+    */
     
     estado_inicial = pedir_estado_inicial(Q);
 
@@ -183,7 +191,9 @@ void convertir_a_afd()
 
     vector<string> nueva_Q;
     vector<Estado> nuevos_estados_obj;
-    vector<vector<string>> tabla_transicion(nueva_Q.size(),vector<string>(Sigma.size()));
+    tabla_transicion.clear();
+    tabla_transicion.resize(nueva_Q.size(),vector<string>(Sigma.size()));
+    //vector<vector<string>> tabla_transicion(nueva_Q.size(),vector<string>(Sigma.size()));
     //nuevo estado inicial = combinacion de todos los pseudo iniciales
     int estado_inicial = combinar_estados(pseudo_iniciales, true, nueva_Q, nuevos_estados_obj);
     cout << "nuevo estado inicial creado " << nuevos_estados_obj[estado_inicial].nombre << endl;
@@ -191,7 +201,8 @@ void convertir_a_afd()
     generar_nuevos_estados_afd(Sigma,estado_inicial, pseudo_iniciales, tabla_transicion_afnd, Q, nueva_Q, tabla_transicion, nuevos_estados_obj);
 
     Q = nueva_Q;
-    vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); // borramos todas las transiciones con epsilon
+    transiciones_epsilon.clear();
+    //vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); // borramos todas las transiciones con epsilon
     print_tabla_transicion(tabla_transicion,Q,Sigma);
 
     //generamos las nuevas transiciones
@@ -202,7 +213,14 @@ void convertir_a_afd()
     estados_obj = nuevos_estados_obj;
     afd = true;
 
-    //imrprimimos los nuevos estados
+    //marcamos los nuevos estados finales
+    estados_finales.clear();
+    for(int i=0;i<estados_obj.size();i++)
+    {
+        if(estados_obj[i].final) estados_finales.push_back(i);
+    }
+
+    //imprimimos los nuevos estados
     for(int i=0;i<estados_obj.size();i++)
     {
         estados_obj[i].print();
@@ -222,6 +240,8 @@ void simplificar_afd()
     vector<tabla_comparativa> tablas_comparativas; // tabla
     //revisamos compatibilidad
     crear_matriz_compatibilidad(compatibilidad,tablas_comparativas,estados_obj);
+
+    print_matriz_compatibilidad(compatibilidad);
     
     cout << "comparando estados compatibles" << endl;
     // por cada tabla comparativa, se hace la comparacion
@@ -229,7 +249,7 @@ void simplificar_afd()
     {
         //cout << "compat " << tablas_comparativas[i].estado_1->nombre << "  " << tablas_comparativas[i].estado_2->nombre << endl;
         if(!tablas_comparativas[i].han_sido_comparados) // solo si no han sido comparadas
-        tablas_comparativas[i].comprobar_si_son_distinguibles(compatibilidad,Sigma);
+        tablas_comparativas[i].comprobar_si_son_distinguibles(compatibilidad,Sigma, tablas_comparativas);
     }
 
     //este vector tendra los pares de estados no distinguibles SIN REPETIR

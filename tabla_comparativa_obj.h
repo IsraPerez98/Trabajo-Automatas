@@ -19,5 +19,5 @@ class tabla_comparativa
         // si ya han sido comparados
         bool han_sido_comparados;
 
-        bool comprobar_si_son_distinguibles(vector<vector<bool>> &tabla_compatibilidad, vector<string> Sigma);
+        bool comprobar_si_son_distinguibles(vector<vector<bool>> &tabla_compatibilidad, vector<string> Sigma,vector<tabla_comparativa> &tablas_comparativas);
 };

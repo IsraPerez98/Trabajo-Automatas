@@ -126,3 +126,17 @@ bool comparacion_string(std::string a, std::string b) // funcion utilizada para 
 {
     return a<b;
 }
+
+void print_matriz_compatibilidad(vector<vector<bool>> compatibilidad)
+{
+    cout << "matriz de compatibilidad: " << endl;
+    for(int i=0;i<compatibilidad.size();i++)
+    {
+        for(int j=0;j<i;j++)
+        {
+            cout << compatibilidad[i][j] << "  ";
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
