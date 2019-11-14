@@ -20,11 +20,11 @@ bool afd; // grafo es afd o afnd
 vector<string> Q; //estados
 vector<string> Sigma; //alfabeto
 
-vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
+vector<vector<string> > tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
 
-vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
+vector<vector<string> > transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
 //este puede tomar varios valores simultaneos
-//mismo tramaño que Q
+//mismo ramaño que Q
 
 int estado_inicial; // indice del vector Q, con el estado inicial
 vector<int> estados_finales; // indices del vector Q para los estados finales
@@ -48,7 +48,7 @@ void ingresar_automata()
     tabla_transicion.clear();
     transiciones_epsilon.clear();
     estados_finales.clear();
-    afd = preguntar_afd_o_afnd();
+    bool afd = preguntar_afd_o_afnd();
 
     pedir_estados(Q);
     pedir_alfabeto(Sigma);
@@ -65,7 +65,7 @@ void ingresar_automata()
     //vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
 
     pedir_tabla_transicion(tabla_transicion, Q, Sigma, afd);
-    
+
     if(!afd)
     {
 
@@ -82,7 +82,7 @@ void ingresar_automata()
         print_tabla_epsilon(transiciones_epsilon,Q,Sigma);
     }
     */
-    
+
     estado_inicial = pedir_estado_inicial(Q);
 
     cout << "Estado inicial: " << Q[estado_inicial] << endl;
@@ -103,7 +103,7 @@ void ingresar_automata()
         Estado estado_obj(Q[i], afd, false, false);
         estados_obj.push_back(estado_obj);
     }
-    
+
     // fijamos estado inicial
     estados_obj[estado_inicial].inicial = true;
     //fijamos estados finales
@@ -124,7 +124,7 @@ void ingresar_automata()
         for(int i=0;i<estados_obj.size();i++)
         {
             estados_obj[i].genererar_transiciones_epsilon(Q,transiciones_epsilon,estados_obj);
-        }    
+        }
     }
 
     //print de todos los estados
@@ -171,7 +171,7 @@ void convertir_a_afd()
     obtener_estados_pseudo(estado_inicial, Q, estados_obj, pseudo_iniciales);
 
     cout << "haciendo una tabla de transicion" << endl;
-    // Q x Sigma x estados_transicion 
+    // Q x Sigma x estados_transicion
     vector<vector<vector<Estado*>>> tabla_transicion_afnd(Q.size(), vector<vector<Estado*>>(Sigma.size()) );
 
     for(int i=0;i<Q.size();i++)
@@ -187,7 +187,7 @@ void convertir_a_afd()
         }
     }
 
-    //print tabla_transicion 
+    //print tabla_transicion
     print_tabla_transicion_afnd(tabla_transicion_afnd, Q, Sigma);
 
     vector<string> nueva_Q;
@@ -243,7 +243,7 @@ void simplificar_afd()
     crear_matriz_compatibilidad(compatibilidad,tablas_comparativas,estados_obj);
 
     print_matriz_compatibilidad(compatibilidad);
-    
+
     cout << "comparando estados compatibles" << endl;
     // por cada tabla comparativa, se hace la comparacion
     for(int i=0;i<tablas_comparativas.size();i++)
@@ -272,14 +272,17 @@ void simplificar_afd()
 int main()
 {
     int opcion = -1;
-    while(opcion != 5)
+    while(opcion != 6)
     {
-        cout << "AFD y AFND" << endl;
+        cout << "AFD y AFND" << endl<<endl;
         verificar_si_ha_ingresado();
+        cout<<endl;
         cout << "1- Ingresar un AFD o AFND" << endl;
         cout << "2- Ingresar una palabra y comprobar si pertenece" << endl;
         cout << "3- Transformar AFND a AFD" << endl;
         cout << "4- Simplificar AFD" << endl;
+        cout << "5- Mostrar tabla de transicion" << endl;
+        cout << "6- Salir" << endl << endl;
         cin >> opcion;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
@@ -300,6 +303,20 @@ int main()
             case 4:
                 if(verificar_si_ha_ingresado()) simplificar_afd();
                 pause();
+                break;
+            case 5:
+                if(verificar_si_ha_ingresado())
+                {
+                    print_tabla_transicion(tabla_transicion,Q,Sigma);
+                    cout<<endl<<endl;
+                    if(transiciones_epsilon.empty()==false)
+                        print_tabla_epsilon(transiciones_epsilon,Q,Sigma);
+                }
+
+                cout<<endl<<endl;
+                pause();
+                break;
+            case 6:
                 break;
         }
     }

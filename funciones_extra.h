@@ -21,10 +21,10 @@ bool estado_es_final(std::string estado, std::vector<std::string> Q, std::vector
 
 void print_vector_estados(vector<Estado*> estados);
 
-void print_tabla_transicion(std::vector<std::vector<std::string>> tabla_transicion, std::vector<std::string> Q, std::vector<std::string> Sigma);
+void print_tabla_transicion(std::vector<std::vector<std::string> > tabla_transicion, std::vector<std::string> Q, std::vector<std::string> Sigma );
 
-void print_tabla_epsilon(std::vector<std::vector<string>> transiciones_epsilon, std::vector<string> Q, std::vector<string> Sigma);
+void print_tabla_epsilon(std::vector<std::vector<string> > transiciones_epsilon, std::vector<string> Q, std::vector<string> Sigma);
 
-bool comparacion_string(std::string a, std::string b); 
+bool comparacion_string(std::string a, std::string b);
 
-void print_matriz_compatibilidad(vector<vector<bool>> compatibilidad);
+void print_matriz_compatibilidad(vector<vector<bool> > compatibilidad);

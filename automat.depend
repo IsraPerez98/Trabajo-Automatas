@@ -1,0 +1,86 @@
+# depslib dependency file v1.0
+1573091826 source:c:\users\alans\desktop\automatas\automat\automata_obj.cpp
+	<string>
+	<map>
+	<iostream>
+	<algorithm>
+	"funciones_extra.h"
+
+1573742073 c:\users\alans\desktop\automatas\automat\funciones_extra.h
+	<vector>
+	<string>
+	"automata_obj.h"
+
+1573096837 c:\users\alans\desktop\automatas\automat\automata_obj.h
+	<map>
+	<vector>
+
+1573091826 source:c:\users\alans\desktop\automatas\automat\funciones_conversion.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+	"funciones_extra.h"
+	"automata_obj.h"
+
+1573742200 source:c:\users\alans\desktop\automatas\automat\funciones_extra.cpp
+	<vector>
+	<string>
+	<iostream>
+	<stdlib.h>
+	<algorithm>
+	"automata_obj.h"
+
+1573091826 source:c:\users\alans\desktop\automatas\automat\funciones_simplificacion.cpp
+	<iostream>
+	<vector>
+	<algorithm>
+	"funciones_extra.h"
+	"automata_obj.h"
+	"tabla_comparativa_obj.h"
+
+1573091826 c:\users\alans\desktop\automatas\automat\tabla_comparativa_obj.h
+	<vector>
+	"automata_obj.h"
+
+1573734624 source:c:\users\alans\desktop\automatas\automat\ingreso_automatas.cpp
+	<iostream>
+	<stdlib.h>
+	<string>
+	<vector>
+	<limits>
+	"funciones_extra.h"
+
+1573742371 source:c:\users\alans\desktop\automatas\automat\main.cpp
+	<iostream>
+	<stdlib.h>
+	<string>
+	<vector>
+	<algorithm>
+	<limits>
+	"funciones_extra.h"
+	"ingreso_automatas.h"
+	"automata_obj.h"
+	"funciones_conversion.h"
+	"funciones_simplificacion.h"
+	"tabla_comparativa_obj.h"
+
+1573091826 c:\users\alans\desktop\automatas\automat\ingreso_automatas.h
+	<vector>
+
+1573091826 c:\users\alans\desktop\automatas\automat\funciones_conversion.h
+	<vector>
+	<string>
+	"automata_obj.h"
+
+1573091826 c:\users\alans\desktop\automatas\automat\funciones_simplificacion.h
+	<vector>
+	"automata_obj.h"
+	"tabla_comparativa_obj.h"
+
+1573091826 source:c:\users\alans\desktop\automatas\automat\tabla_comparativa_obj.cpp
+	<iostream>
+	<vector>
+	"funciones_extra.h"
+	"automata_obj.h"
+	"tabla_comparativa_obj.h"
+
