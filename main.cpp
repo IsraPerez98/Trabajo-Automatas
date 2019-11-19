@@ -4,6 +4,7 @@
 #include<vector>
 #include<algorithm>
 #include<limits>
+#include<iterator>
 
 #include "funciones_extra.h"
 #include "ingreso_automatas.h"
@@ -20,11 +21,11 @@ bool afd; // grafo es afd o afnd
 vector<string> Q; //estados
 vector<string> Sigma; //alfabeto
 
-vector<vector<string>> tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
+vector<vector<string> > tabla_transicion(Q.size(),vector<string>(Sigma.size())); //vector de vectores estados x alfabeto como matriz
 
-vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
+vector<vector<string> > transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
 //este puede tomar varios valores simultaneos
-//mismo tramaño que Q
+//mismo ramaño que Q
 
 int estado_inicial; // indice del vector Q, con el estado inicial
 vector<int> estados_finales; // indices del vector Q para los estados finales
@@ -39,7 +40,7 @@ void pause() // analogo al system pause
     //cin.ignore(numeric_limits<streamsize>::max(), '\n');
 }
 
-void ingresar_automata()
+void ingresar_automata(bool& afd)
 {
     //como vamos a ingresar uno nuevo, reiniciamos todos los valores
     Q.clear();
@@ -65,7 +66,7 @@ void ingresar_automata()
     //vector<vector<string>> transiciones_epsilon(Q.size(), vector<string>(0)); //vector de vectores con las transiciones del epsilon
 
     pedir_tabla_transicion(tabla_transicion, Q, Sigma, afd);
-    
+
     if(!afd)
     {
 
@@ -82,7 +83,7 @@ void ingresar_automata()
         print_tabla_epsilon(transiciones_epsilon,Q,Sigma);
     }
     */
-    
+
     estado_inicial = pedir_estado_inicial(Q);
 
     cout << "Estado inicial: " << Q[estado_inicial] << endl;
@@ -103,7 +104,7 @@ void ingresar_automata()
         Estado estado_obj(Q[i], afd, false, false);
         estados_obj.push_back(estado_obj);
     }
-    
+
     // fijamos estado inicial
     estados_obj[estado_inicial].inicial = true;
     //fijamos estados finales
@@ -124,7 +125,7 @@ void ingresar_automata()
         for(int i=0;i<estados_obj.size();i++)
         {
             estados_obj[i].genererar_transiciones_epsilon(Q,transiciones_epsilon,estados_obj);
-        }    
+        }
     }
 
     //print de todos los estados
@@ -171,7 +172,7 @@ void convertir_a_afd()
     obtener_estados_pseudo(estado_inicial, Q, estados_obj, pseudo_iniciales);
 
     cout << "haciendo una tabla de transicion" << endl;
-    // Q x Sigma x estados_transicion 
+    // Q x Sigma x estados_transicion
     vector<vector<vector<Estado*>>> tabla_transicion_afnd(Q.size(), vector<vector<Estado*>>(Sigma.size()) );
 
     for(int i=0;i<Q.size();i++)
@@ -187,7 +188,7 @@ void convertir_a_afd()
         }
     }
 
-    //print tabla_transicion 
+    //print tabla_transicion
     print_tabla_transicion_afnd(tabla_transicion_afnd, Q, Sigma);
 
     vector<string> nueva_Q;
@@ -236,6 +237,7 @@ void simplificar_afd()
         return;
     }
 
+    /*
     //generamos tabla de los estados
     vector<vector<bool>> compatibilidad(Q.size(), vector<bool>(Q.size()));
     vector<tabla_comparativa> tablas_comparativas; // tabla
@@ -243,14 +245,14 @@ void simplificar_afd()
     crear_matriz_compatibilidad(compatibilidad,tablas_comparativas,estados_obj);
 
     print_matriz_compatibilidad(compatibilidad);
-    
+
     cout << "comparando estados compatibles" << endl;
     // por cada tabla comparativa, se hace la comparacion
     for(int i=0;i<tablas_comparativas.size();i++)
     {
         //cout << "compat " << tablas_comparativas[i].estado_1->nombre << "  " << tablas_comparativas[i].estado_2->nombre << endl;
         if(!tablas_comparativas[i].han_sido_comparados) // solo si no han sido comparadas
-        tablas_comparativas[i].comprobar_si_son_distinguibles(compatibilidad,Sigma, tablas_comparativas);
+            tablas_comparativas[i].comprobar_si_son_distinguibles(compatibilidad,Sigma, tablas_comparativas);
     }
 
     //este vector tendra los pares de estados no distinguibles SIN REPETIR
@@ -266,27 +268,123 @@ void simplificar_afd()
     {
         estados_obj[i].print();
     }
+    */
+    cout<<endl;
+    cout<<"Tabla de comparacion"<<endl<<endl;
+    int cont=1;
+    map<Estado*,Estado*> qcomp; //mapa de estados compatibles
+
+    Estado* qx;
+    Estado* qy;
+    int posqx,posqy;
+    int aeliminar;
+    string ctr;
+    map<string,Estado*>::iterator itr;
+
+    for(int i=1;i<estados_obj.size();i++)
+    {
+        cout<<estados_obj[i].nombre<<"\t";
+        for(int j=0;j<cont;j++)
+        {
+            if(comparacion_bool(estados_obj[i].final,estados_obj[j].final)==false)
+            {
+                cout<<"X"<<"\t";
+            }
+            else
+            {
+
+                for (int x=0;x<Sigma.size();x++)
+                {
+                    qx = estados_obj[i].transiciones.at(Sigma[x]);
+                    qy = estados_obj[j].transiciones.at(Sigma[x]);
+
+                    if(comparacion_bool(qx->final,qy->final)==false)
+                    {
+                        ctr="X";
+                        break;
+                    }
+                    else
+                        ctr="ND";
+                }
+                cout<<ctr<<"\t";
+                /*
+                if(ctr=="ND")
+                {
+                    cout<<"El estado "<<estados_obj[i].nombre<<" es equivalente a el estado  " <<estados_obj[j] <<endl;
+                    cout<<"Elija cual desea eliminar:\n1)"<<estados_obj[i].nombre<<"\n2)"<<estados_obj[j].nombre<<endl;
+                    cin>>aeliminar;
+                    if(cin.fail())
+                    {
+                        while(cin.fail())
+                        {
+                            cin.clear;
+                            cin.ignore(INT_MAX,'\n');
+                            cout<<"Elija cual desea eliminar:\n1)"<<estados_obj[i].nombre<<"\n2)"<<estados_obj[j].nombre<<endl;
+                            cin>>aeliminar;
+                        }
+                    }
+                    switch(aeliminar)
+                    {
+                        case 1:
+                        {
+                            estados_obj.erase(i);
+                            for(itr=estados_obj[j].transiciones.begin();itr!=estados_obj[j].transiciones.end();itr++)
+                            {
+                                itr->second = estados_obj[j];
+                            }
+                            break;
+                        }
+                        case 2:
+                        {
+                            estados_obj.erase(j);
+                            for(itr=estados_obj.begin();itr!=estados_obj.end();itr++)
+                    {
+                        itr->second = estados_obj[i];
+                    }
+                            break;
+                        }
+                        default:
+                            cout<<"Elija una opcion valida..."<<endl;
+                    }
+
+                }
+                */
+            }
+
+        }
+        cout << "\n\n";
+        cont++;
+    }
+    cout<<"\t";
+    for(int n=0;n<(estados_obj.size()-1);n++)
+    {
+        cout<<estados_obj[n].nombre<<"\t";
+    }
+    cout<<endl<<endl;
 
 }
 
 int main()
 {
     int opcion = -1;
-    while(opcion != 5)
+    while(opcion != 6)
     {
-        cout << "AFD y AFND" << endl;
+        cout << "AFD y AFND" << endl<<endl;
         verificar_si_ha_ingresado();
+        cout<<endl;
         cout << "1- Ingresar un AFD o AFND" << endl;
         cout << "2- Ingresar una palabra y comprobar si pertenece" << endl;
         cout << "3- Transformar AFND a AFD" << endl;
         cout << "4- Simplificar AFD" << endl;
+        cout << "5- Mostrar tabla de transicion" << endl;
+        cout << "6- Salir" << endl << endl;
         cin >> opcion;
         cin.clear();
         cin.ignore(numeric_limits<streamsize>::max(), '\n');
         switch(opcion)
         {
             case 1:
-                ingresar_automata();
+                ingresar_automata(afd);
                 pause();
                 break;
             case 2:
@@ -300,6 +398,20 @@ int main()
             case 4:
                 if(verificar_si_ha_ingresado()) simplificar_afd();
                 pause();
+                break;
+            case 5:
+                if(verificar_si_ha_ingresado())
+                {
+                    print_tabla_transicion(tabla_transicion,Q,Sigma);
+                    cout<<endl<<endl;
+                    if(!afd)
+                        print_tabla_epsilon(transiciones_epsilon,Q,Sigma);
+                }
+
+                cout<<endl<<endl;
+                pause();
+                break;
+            case 6:
                 break;
         }
     }

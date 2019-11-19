@@ -6,6 +6,12 @@
 #include "funciones_extra.h"
 using namespace std;
 
+Estado::Estado()
+{
+
+}
+
+
 Estado::Estado(string nombre, bool afd, bool inicial, bool final)
 {
     this->nombre = nombre;
@@ -44,7 +50,7 @@ void Estado::print()
     if(this->final) cout << "[estado final]" << endl;
 
     print_transiciones();
-    
+
 }
 
 void Estado::generar_transiciones(vector<string> Q, vector<string> Sigma, vector<vector<string>> tabla_transicion, vector<Estado> &estados_obj)
@@ -93,7 +99,7 @@ void Estado::transiciones_afnd(vector<Estado*> &transiciones_posibles, string le
     if(this->transiciones.find(letra) != this->transiciones.end() ) // transiciones normales
     {
         Estado* estado_siguiente = this->transiciones[letra];
-        
+
         cout << "  transicion de " << this->nombre << " con " << letra << " " << this->transiciones[letra]->nombre << endl;
         // continuamos de forma recursiva sin considerar la letra
         estado_siguiente->transiciones_afnd(transiciones_posibles,"", estados_revisados);
