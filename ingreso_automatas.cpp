@@ -8,6 +8,9 @@
 
 using namespace std;
 
+
+
+
 bool preguntar_afd_o_afnd()
 {
     cout << "El automata a ingresar es AFD? S/N" << endl;
@@ -46,7 +49,7 @@ void pedir_alfabeto(vector<string> &Sigma)
 
 void pedir_tabla_transicion(vector<vector<string>> &tabla, vector<string> Q, vector<string> Sigma , bool afd) // https://stackoverflow.com/a/34182883
 {
-    for(int i=0;i<Q.size();i++) 
+    for(int i=0;i<Q.size();i++)
     {
         //cout << "i: " << i << endl;
         for(int j=0;j<Sigma.size();j++)

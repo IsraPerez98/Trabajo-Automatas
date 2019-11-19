@@ -42,7 +42,7 @@ void print_vector(vector<string> a)
 
 bool verificar_estado_valido(string estado, vector<string> Q, bool considerar_guion)
 {
-    if(considerar_guion && estado == "-") return true; 
+    if(considerar_guion && estado == "-") return true;
     for(int i=0;i<Q.size();i++)
     {
         if(Q[i] == estado) return true;
@@ -100,17 +100,39 @@ void print_vector_estados(vector<Estado*> estados)
 void print_tabla_transicion(vector<vector<string>> tabla_transicion, vector<string> Q, vector<string> Sigma)
 {
     //print de la tabla de transicion
-    for(int i=0; i<Q.size(); i++)
+    /*for(int i=0; i<Q.size(); i++)
     {
         for(int j=0; j<Sigma.size(); j++)
         {
             cout << "transicion estado " << Q[i] << " con entrada " << Sigma[j] << " = " << tabla_transicion[i][j] << endl;
         }
     }
+    */
+    cout<<"Tabla de transicion "<<endl<<endl;
+    int n=0;
+    do
+    {
+        cout<<"\t";
+        cout<<Sigma[n];
+        n++;
+    }while(n<Sigma.size());
+
+    for(int i=0;i<Q.size();i++)
+    {
+        cout<<"\n";
+        for(int j=0;j<Sigma.size();j++)
+        {
+            if(j==0)
+                cout<<Q[i]<<"\t";
+            cout<<tabla_transicion[i][j]<<"\t";
+        }
+    }
+
 }
 
 void print_tabla_epsilon(vector<vector<string>> transiciones_epsilon, vector<string> Q, vector<string> Sigma)
 {
+    /*
     for(int i=0; i<Q.size(); i++)
     {
         cout << "transiciones epsilon de " << Q[i] << " : ";
@@ -120,6 +142,24 @@ void print_tabla_epsilon(vector<vector<string>> transiciones_epsilon, vector<str
         }
         cout << endl;
     }
+    */
+    cout<<"Tabla de transiciones Epsilon "<<endl<<endl;
+    cout<<"\t"<<"e";
+
+    for(int i=0;i<Q.size();i++)
+    {
+        cout<<"\n";
+        for(int j=0;j<transiciones_epsilon[i].size();j++)
+        {
+            if(j==0)
+                cout<<Q[i]<<"\t";
+            if(transiciones_epsilon[i][j]!="-")
+                cout<<transiciones_epsilon[i][j];
+                if(j!=(transiciones_epsilon[i].size()-1))
+                    cout<<",";
+        }
+    }
+
 }
 
 bool comparacion_string(std::string a, std::string b) // funcion utilizada para ordenar un vector de forma alfabetica
